@@ -46,7 +46,6 @@ class ReplayDevinClientTest {
         clock.advanceSeconds(11);
         assertThat(client.getSession(session.sessionId()).status()).isEqualTo("suspended");
         client.sendMessage(session.sessionId(), "CI failed on the pull request you opened for issue #47");
-        clock.advanceSeconds(8);
         DevinSession resuming = client.getSession(session.sessionId());
         assertThat(resuming.status()).isEqualTo("resuming");
         assertThat(resuming.sessionStatus().isActive()).isTrue();

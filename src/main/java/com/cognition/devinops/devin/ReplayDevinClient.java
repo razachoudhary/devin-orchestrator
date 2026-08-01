@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,7 @@ public class ReplayDevinClient implements DevinClient {
     private final AtomicInteger counter = new AtomicInteger();
     private final Clock clock;
 
+    @Autowired
     public ReplayDevinClient(ObjectMapper objectMapper) {
         this(objectMapper, Clock.systemUTC());
     }
@@ -75,7 +77,19 @@ public class ReplayDevinClient implements DevinClient {
 
     @Override
     public void sendMessage(String sessionId, String message) {
-        required(sessionId).messages().add(message);
+        ReplaySession session = required(sessionId);
+        session.messages().add(message);
+        resumeAfterMessage(session);
+    }
+
+    private void resumeAfterMessage(ReplaySession session) {
+        long elapsedSeconds = Duration.between(session.startedAt(), clock.instant()).toSeconds();
+        for (TimelineEntry entry : timelines.get(session.scenario())) {
+            if (entry.elapsedSeconds() > elapsedSeconds && "resuming".equals(entry.session().status())) {
+                session.setStartedAt(clock.instant().minusSeconds(entry.elapsedSeconds()));
+                return;
+            }
+        }
     }
 
     @Override
@@ -124,10 +138,31 @@ public class ReplayDevinClient implements DevinClient {
     ) {
     }
 
-    private record ReplaySession(String scenario, Instant startedAt, List<String> messages) {
+    private static final class ReplaySession {
+
+        private final String scenario;
+        private final List<String> messages = new ArrayList<>();
+        private Instant startedAt;
 
         ReplaySession(String scenario, Instant startedAt) {
-            this(scenario, startedAt, new ArrayList<>());
+            this.scenario = scenario;
+            this.startedAt = startedAt;
+        }
+
+        String scenario() {
+            return scenario;
+        }
+
+        Instant startedAt() {
+            return startedAt;
+        }
+
+        void setStartedAt(Instant startedAt) {
+            this.startedAt = startedAt;
+        }
+
+        List<String> messages() {
+            return messages;
         }
     }
 }

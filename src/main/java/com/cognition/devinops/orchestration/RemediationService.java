@@ -19,6 +19,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -118,6 +119,14 @@ public class RemediationService {
                         transition(remediation, RemediationState.ESCALATED, "repair message dispatch failed");
                     }
                 });
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void recordGatedRejection(int issueNumber, String issueTitle, FindingSource source, String reason) {
+        Remediation remediation = Remediation.receive(issueNumber, issueTitle, source);
+        remediation.transitionTo(RemediationState.GATED_REJECTED, reason);
+        remediations.save(remediation);
+        statusCommentPublisher.sync(remediation);
     }
 
     @Transactional

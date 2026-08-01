@@ -146,12 +146,12 @@ class RemediationFlowIntegrationTest {
         service.onCheckRunCompleted(484, "pytest", "failure", "flaky ordering");
         assertThat(remediation.getRepairAttempts()).isEqualTo(1);
 
-        clock.advanceSeconds(12);
+        clock.advanceSeconds(6);
         reconciler.reconcile();
         service.onCheckRunCompleted(484, "pytest", "failure", "flaky ordering");
         assertThat(remediation.getRepairAttempts()).isEqualTo(2);
 
-        clock.advanceSeconds(12);
+        clock.advanceSeconds(6);
         reconciler.reconcile();
         service.onCheckRunCompleted(484, "pytest", "failure", "flaky ordering");
 
