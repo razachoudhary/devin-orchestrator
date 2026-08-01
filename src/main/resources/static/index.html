@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devin Remediation Orchestrator</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --ink: #1a1f27;
+    --ink-secondary: #5b6472;
+    --ink-muted: #8b93a1;
+    --border: #e3e6ea;
+    --accent: #2563eb;
+    --good-bg: #e5f3e9;    --good-ink: #1a6b34;
+    --warn-bg: #fdf0e0;    --warn-ink: #92500a;
+    --bad-bg: #fbe7e7;     --bad-ink: #a02323;
+    --run-bg: #e5edfd;     --run-ink: #1d4fc4;
+    --idle-bg: #eceef1;    --idle-ink: #5b6472;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171c;
+      --surface: #1d2129;
+      --ink: #e8eaee;
+      --ink-secondary: #a4abb8;
+      --ink-muted: #737b89;
+      --border: #2c313b;
+      --accent: #6495f7;
+      --good-bg: #17301e;   --good-ink: #6bc286;
+      --warn-bg: #33250e;   --warn-ink: #e2a154;
+      --bad-bg: #371b1b;    --bad-ink: #e07c7c;
+      --run-bg: #1a2540;    --run-ink: #86a9f5;
+      --idle-bg: #262b34;   --idle-ink: #a4abb8;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 60px; }
+  header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  h1 { font-size: 19px; font-weight: 600; margin: 0; }
+  .sim-badge {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.03em;
+    background: var(--run-bg); color: var(--run-ink);
+    padding: 2px 9px; border-radius: 99px; display: none;
+  }
+  .hero {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 20px 24px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+  }
+  .hero .value { font-size: 52px; font-weight: 650; line-height: 1.1; }
+  .hero .label { color: var(--ink-secondary); max-width: 420px; }
+  .hero-caption { font-size: 12.5px; color: var(--ink-secondary); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .tile {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 13px 16px;
+  }
+  .tile .label { font-size: 12.5px; color: var(--ink-secondary); margin-bottom: 3px; }
+  .tile .value { font-size: 23px; font-weight: 600; }
+  .panel {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 20px; margin-bottom: 14px;
+  }
+  .panel h2 { font-size: 13px; font-weight: 600; color: var(--ink-secondary); margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .sim-buttons { display: none; gap: 8px; flex-wrap: wrap; }
+  .sim-buttons button {
+    font: inherit; font-size: 13.5px; font-weight: 500;
+    background: var(--surface); color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 7px 14px; cursor: pointer;
+  }
+  .sim-buttons button:hover { background: var(--run-bg); }
+  .esc-list { display: flex; gap: 8px; flex-wrap: wrap; }
+  .esc-item { background: var(--warn-bg); color: var(--warn-ink); border-radius: 7px; padding: 4px 10px; font-size: 13.5px; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 6px 10px; border-bottom: 1px solid var(--border);
+  }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  th.num { text-align: right; }
+  .badge {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    border-radius: 6px; padding: 2px 8px; white-space: nowrap;
+  }
+  .b-merged { background: var(--good-bg); color: var(--good-ink); }
+  .b-escalated { background: var(--warn-bg); color: var(--warn-ink); }
+  .b-failed { background: var(--bad-bg); color: var(--bad-ink); }
+  .b-running { background: var(--run-bg); color: var(--run-ink); }
+  .b-idle { background: var(--idle-bg); color: var(--idle-ink); }
+  .title-cell { color: var(--ink-secondary); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .reason { color: var(--ink-muted); font-size: 12.5px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .empty { color: var(--ink-muted); padding: 14px 0; }
+  footer { color: var(--ink-muted); font-size: 12.5px; margin-top: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Devin Remediation Orchestrator</h1>
+    <span class="sim-badge" id="simBadge">SIMULATE MODE</span>
+  </header>
+
+  <div class="hero">
+    <div>
+      <div class="value" id="heroValue">–</div>
+      <div class="hero-caption">Repair-loop recoveries</div>
+    </div>
+    <div class="label">
+      Merged pull requests that first failed CI and were repaired by sending the
+      failure log back into the same Devin session.
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><div class="label">Success rate</div><div class="value" id="successRate">–</div></div>
+    <div class="tile"><div class="label">Cost per merged PR</div><div class="value" id="costPerPr">–</div></div>
+    <div class="tile"><div class="label">ACUs per merged PR</div><div class="value" id="acusPerPr">–</div></div>
+    <div class="tile"><div class="label">Total ACUs</div><div class="value" id="totalAcus">–</div></div>
+    <div class="tile"><div class="label">Median cycle time</div><div class="value" id="medianCycle">–</div></div>
+    <div class="tile"><div class="label">First-pass CI success</div><div class="value" id="firstPass">–</div></div>
+    <div class="tile"><div class="label">In flight</div><div class="value" id="inFlight">–</div></div>
+  </div>
+
+  <div class="panel" id="simPanel" style="display:none">
+    <h2>Run a scenario</h2>
+    <div class="sim-buttons" id="simButtons" style="display:flex">
+      <button data-scenario="happy-path">Happy path</button>
+      <button data-scenario="repair-loop">Repair loop</button>
+      <button data-scenario="escalation">Escalation</button>
+      <button data-scenario="blocked">Budget blocked</button>
+    </div>
+  </div>
+
+  <div class="panel" id="escPanel" style="display:none">
+    <h2>Escalations by reason</h2>
+    <div class="esc-list" id="escList"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Remediations</h2>
+    <div id="tableHolder"><div class="empty">Nothing yet. Label an issue with <code>devin-fix</code> or run a scenario.</div></div>
+  </div>
+
+  <footer>Refreshes every 2 seconds · <a href="/api/dashboard">raw JSON</a></footer>
+</div>
+
+<script>
+  const BADGE_CLASS = {
+    MERGED: "b-merged",
+    ESCALATED: "b-escalated",
+    FAILED: "b-failed",
+    GATED_REJECTED: "b-idle",
+    RECEIVED: "b-idle",
+    SESSION_RUNNING: "b-running",
+    PR_OPEN: "b-running",
+    CI_FAILED: "b-escalated",
+    REPAIR_DISPATCHED: "b-running"
+  };
+
+  const fmt = {
+    pct: v => v == null ? "–" : Math.round(v * 100) + "%",
+    usd: v => v == null ? "–" : "$" + v.toFixed(2),
+    num: v => v == null ? "–" : (typeof v === "number" ? v.toFixed(1) : v),
+    min: v => v == null ? "–" : v.toFixed(1) + "m"
+  };
+
+  function esc(text) {
+    const div = document.createElement("div");
+    div.textContent = text == null ? "" : String(text);
+    return div.innerHTML;
+  }
+
+  function render(stats) {
+    document.getElementById("heroValue").textContent = stats.repairLoopRecoveries;
+    document.getElementById("successRate").textContent = fmt.pct(stats.successRate);
+    document.getElementById("costPerPr").textContent = fmt.usd(stats.estimatedCostPerMergedPr);
+    document.getElementById("acusPerPr").textContent = fmt.num(stats.acusPerMergedPr);
+    document.getElementById("totalAcus").textContent = stats.totalAcus == null ? "–" : stats.totalAcus;
+    document.getElementById("medianCycle").textContent = fmt.min(stats.medianCycleTimeMinutes);
+    document.getElementById("firstPass").textContent = fmt.pct(stats.firstPassCiSuccessRate);
+    document.getElementById("inFlight").textContent = stats.totals.inFlight;
+
+    document.getElementById("simBadge").style.display = stats.simulateMode ? "inline-block" : "none";
+    document.getElementById("simPanel").style.display = stats.simulateMode ? "block" : "none";
+
+    const escEntries = Object.entries(stats.escalationsByReason || {});
+    document.getElementById("escPanel").style.display = escEntries.length ? "block" : "none";
+    document.getElementById("escList").innerHTML = escEntries
+      .map(([reason, count]) => `<span class="esc-item">${esc(reason)} × ${count}</span>`)
+      .join("");
+
+    const holder = document.getElementById("tableHolder");
+    if (!stats.remediations.length) {
+      holder.innerHTML = '<div class="empty">Nothing yet. Label an issue with <code>devin-fix</code> or run a scenario.</div>';
+      return;
+    }
+    const rows = stats.remediations.map(r => `
+      <tr>
+        <td class="num">#${r.issueNumber}</td>
+        <td class="title-cell" title="${esc(r.issueTitle)}">${esc(r.issueTitle)}</td>
+        <td>
+          <span class="badge ${BADGE_CLASS[r.state] || "b-idle"}">${esc(r.state)}</span>
+          ${r.stateReason ? `<div class="reason">${esc(r.stateReason)}</div>` : ""}
+        </td>
+        <td>
+          ${r.prUrl ? `<a href="${esc(r.prUrl)}" target="_blank" rel="noopener">PR</a>` : ""}
+          ${r.sessionUrl ? ` <a href="${esc(r.sessionUrl)}" target="_blank" rel="noopener">session</a>` : ""}
+        </td>
+        <td class="num">${r.acus == null ? "–" : r.acus}</td>
+        <td class="num">${r.repairAttempts}</td>
+        <td class="num">${r.cycleTimeMinutes == null ? "–" : r.cycleTimeMinutes.toFixed(1) + "m"}</td>
+      </tr>`).join("");
+    holder.innerHTML = `
+      <table>
+        <thead><tr>
+          <th class="num">Issue</th><th>Title</th><th>State</th><th>Links</th>
+          <th class="num">ACUs</th><th class="num">Repairs</th><th class="num">Cycle</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  async function refresh() {
+    try {
+      const response = await fetch("/api/dashboard");
+      if (response.ok) {
+        render(await response.json());
+      }
+    } catch (e) {
+    }
+  }
+
+  document.getElementById("simButtons").addEventListener("click", async event => {
+    const scenario = event.target.dataset && event.target.dataset.scenario;
+    if (!scenario) return;
+    event.target.disabled = true;
+    try {
+      await fetch("/admin/simulate/" + scenario, { method: "POST" });
+    } finally {
+      setTimeout(() => { event.target.disabled = false; }, 1500);
+    }
+    refresh();
+  });
+
+  refresh();
+  setInterval(refresh, 2000);
+</script>
+</body>
+</html>

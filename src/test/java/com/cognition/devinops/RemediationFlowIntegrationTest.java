@@ -2,6 +2,8 @@ package com.cognition.devinops;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.cognition.devinops.dashboard.DashboardController;
+import com.cognition.devinops.dashboard.DashboardStats;
 import com.cognition.devinops.devin.ReplayDevinClient;
 import com.cognition.devinops.domain.FindingSource;
 import com.cognition.devinops.domain.Remediation;
@@ -64,6 +66,9 @@ class RemediationFlowIntegrationTest {
 
     @Autowired
     private MutableClock clock;
+
+    @Autowired
+    private DashboardController dashboardController;
 
     private int issueNumber = 100;
 
@@ -135,6 +140,12 @@ class RemediationFlowIntegrationTest {
                 RemediationState.REPAIR_DISPATCHED,
                 RemediationState.PR_OPEN,
                 RemediationState.MERGED);
+
+        DashboardStats stats = dashboardController.dashboard();
+        assertThat(stats.totals().merged()).isEqualTo(1);
+        assertThat(stats.repairLoopRecoveries()).isEqualTo(1);
+        assertThat(stats.firstPassCiSuccessRate()).isEqualTo(0.0);
+        assertThat(stats.estimatedCostPerMergedPr()).isGreaterThan(0.0);
     }
 
     @Test
