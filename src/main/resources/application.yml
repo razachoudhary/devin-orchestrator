@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: devin-remediation-orchestrator
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/devinops}
+    username: ${SPRING_DATASOURCE_USERNAME:devinops}
+    password: ${SPRING_DATASOURCE_PASSWORD:devinops}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+devin:
+  base-url: ${DEVIN_BASE_URL:https://api.devin.ai}
+  api-key: ${DEVIN_API_KEY:}
+  org-id: ${DEVIN_ORG_ID:}
+  remediation-playbook-id: ${DEVIN_REMEDIATION_PLAYBOOK_ID:}
+  scout-playbook-id: ${DEVIN_SCOUT_PLAYBOOK_ID:}
+  fork-knowledge-id: ${DEVIN_FORK_KNOWLEDGE_ID:}
+  tags-enabled: ${DEVIN_TAGS_ENABLED:true}
+  max-acu-limit: ${DEVIN_MAX_ACU_LIMIT:10}
+
+github:
+  token: ${GITHUB_TOKEN:}
+  webhook-secret: ${GITHUB_WEBHOOK_SECRET:}
+  repo: ${GITHUB_REPO:razachoudhary/devin-superset}
+  base-url: ${GITHUB_BASE_URL:https://api.github.com}
+
+app:
+  daily-session-budget: ${APP_DAILY_SESSION_BUDGET:20}
+  max-repair-attempts: ${APP_MAX_REPAIR_ATTEMPTS:2}
+  session-timeout-minutes: ${APP_SESSION_TIMEOUT_MINUTES:45}
+  acu-cost-usd: ${APP_ACU_COST_USD:2.00}
+  ci-command: ${APP_CI_COMMAND:pytest devin_gate_tests/ -q}
+  reconcile-interval-ms: ${APP_RECONCILE_INTERVAL_MS:10000}

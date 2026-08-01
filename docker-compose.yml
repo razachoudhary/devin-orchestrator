@@ -1,0 +1,44 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/devinops
+      SPRING_DATASOURCE_USERNAME: devinops
+      SPRING_DATASOURCE_PASSWORD: devinops
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      DEVIN_API_KEY: ${DEVIN_API_KEY:-}
+      DEVIN_ORG_ID: ${DEVIN_ORG_ID:-}
+      DEVIN_REMEDIATION_PLAYBOOK_ID: ${DEVIN_REMEDIATION_PLAYBOOK_ID:-}
+      DEVIN_SCOUT_PLAYBOOK_ID: ${DEVIN_SCOUT_PLAYBOOK_ID:-}
+      DEVIN_FORK_KNOWLEDGE_ID: ${DEVIN_FORK_KNOWLEDGE_ID:-}
+      DEVIN_TAGS_ENABLED: ${DEVIN_TAGS_ENABLED:-true}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET:-}
+      GITHUB_REPO: ${GITHUB_REPO:-razachoudhary/devin-superset}
+      APP_DAILY_SESSION_BUDGET: ${APP_DAILY_SESSION_BUDGET:-20}
+      APP_MAX_REPAIR_ATTEMPTS: ${APP_MAX_REPAIR_ATTEMPTS:-2}
+      APP_SESSION_TIMEOUT_MINUTES: ${APP_SESSION_TIMEOUT_MINUTES:-45}
+      APP_ACU_COST_USD: ${APP_ACU_COST_USD:-2.00}
+      APP_CI_COMMAND: ${APP_CI_COMMAND:-pytest devin_gate_tests/ -q}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: devinops
+      POSTGRES_USER: devinops
+      POSTGRES_PASSWORD: devinops
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devinops -d devinops"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
