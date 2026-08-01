@@ -1,0 +1,96 @@
+[
+  {
+    "elapsed_seconds": 0,
+    "session": {
+      "status": "running",
+      "reason": "working",
+      "pull_requests": [],
+      "acus_consumed": 0.4,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 6,
+    "session": {
+      "status": "running",
+      "reason": "working",
+      "pull_requests": [],
+      "acus_consumed": 1.6,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 10,
+    "session": {
+      "status": "suspended",
+      "reason": "finished",
+      "pull_requests": [
+        {
+          "url": "https://github.com/razachoudhary/devin-superset/pull/483",
+          "number": 483
+        }
+      ],
+      "acus_consumed": 2.9,
+      "structured_output": {
+        "summary": "Added a regression test for the null-currency crash in the number formatter.",
+        "root_cause": "format_currency assumed a non-null currency code and raised AttributeError on None.",
+        "files_changed": ["devin_gate_tests/test_number_formatter_regression.py"],
+        "tests_added": ["test_format_currency_handles_missing_currency"],
+        "verification": "pytest devin_gate_tests/ -q passes locally",
+        "confidence": "medium"
+      }
+    }
+  },
+  {
+    "elapsed_seconds": 18,
+    "session": {
+      "status": "resuming",
+      "reason": "working",
+      "pull_requests": [
+        {
+          "url": "https://github.com/razachoudhary/devin-superset/pull/483",
+          "number": 483
+        }
+      ],
+      "acus_consumed": 2.9,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 22,
+    "session": {
+      "status": "running",
+      "reason": "working",
+      "pull_requests": [
+        {
+          "url": "https://github.com/razachoudhary/devin-superset/pull/483",
+          "number": 483
+        }
+      ],
+      "acus_consumed": 3.4,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 30,
+    "session": {
+      "status": "suspended",
+      "reason": "finished",
+      "pull_requests": [
+        {
+          "url": "https://github.com/razachoudhary/devin-superset/pull/483",
+          "number": 483
+        }
+      ],
+      "acus_consumed": 4.6,
+      "structured_output": {
+        "summary": "Repaired the regression test after the CI failure: the fixture locale differed from CI's default locale.",
+        "root_cause": "The test hard-coded en_US formatting; CI runs under C locale, producing a different thousands separator.",
+        "files_changed": ["devin_gate_tests/test_number_formatter_regression.py"],
+        "tests_added": ["test_format_currency_handles_missing_currency"],
+        "verification": "pytest devin_gate_tests/ -q passes under both en_US and C locales",
+        "confidence": "high"
+      }
+    }
+  }
+]

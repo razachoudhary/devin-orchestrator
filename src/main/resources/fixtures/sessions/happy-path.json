@@ -1,0 +1,44 @@
+[
+  {
+    "elapsed_seconds": 0,
+    "session": {
+      "status": "running",
+      "reason": "working",
+      "pull_requests": [],
+      "acus_consumed": 0.3,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 6,
+    "session": {
+      "status": "running",
+      "reason": "working",
+      "pull_requests": [],
+      "acus_consumed": 1.8,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 12,
+    "session": {
+      "status": "suspended",
+      "reason": "finished",
+      "pull_requests": [
+        {
+          "url": "https://github.com/razachoudhary/devin-superset/pull/482",
+          "number": 482
+        }
+      ],
+      "acus_consumed": 3.4,
+      "structured_output": {
+        "summary": "Added a regression test covering the timezone-shift bug in the rolling window post-processor.",
+        "root_cause": "pd.date_range dropped the DST transition hour, so rolling window offsets misaligned by one bucket.",
+        "files_changed": ["devin_gate_tests/test_rolling_window_regression.py"],
+        "tests_added": ["test_rolling_window_preserves_dst_transition_hour"],
+        "verification": "pytest devin_gate_tests/ -q fails against the pre-fix logic and passes against the post-fix logic",
+        "confidence": "high"
+      }
+    }
+  }
+]

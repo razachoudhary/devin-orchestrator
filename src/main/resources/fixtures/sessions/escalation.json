@@ -1,0 +1,108 @@
+[
+  {
+    "elapsed_seconds": 0,
+    "session": {
+      "status": "running",
+      "reason": "working",
+      "pull_requests": [],
+      "acus_consumed": 0.5,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 8,
+    "session": {
+      "status": "suspended",
+      "reason": "finished",
+      "pull_requests": [
+        {
+          "url": "https://github.com/razachoudhary/devin-superset/pull/484",
+          "number": 484
+        }
+      ],
+      "acus_consumed": 3.1,
+      "structured_output": {
+        "summary": "Added a regression test for the cache-key collision between dashboards sharing a chart.",
+        "root_cause": "Cache keys omitted the dashboard id, so two dashboards sharing a chart overwrote each other's filters.",
+        "files_changed": ["devin_gate_tests/test_cache_key_regression.py"],
+        "tests_added": ["test_cache_key_includes_dashboard_id"],
+        "verification": "pytest devin_gate_tests/ -q passes locally but relies on dict ordering",
+        "confidence": "low"
+      }
+    }
+  },
+  {
+    "elapsed_seconds": 14,
+    "session": {
+      "status": "resuming",
+      "reason": "working",
+      "pull_requests": [
+        {
+          "url": "https://github.com/razachoudhary/devin-superset/pull/484",
+          "number": 484
+        }
+      ],
+      "acus_consumed": 3.2,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 20,
+    "session": {
+      "status": "suspended",
+      "reason": "finished",
+      "pull_requests": [
+        {
+          "url": "https://github.com/razachoudhary/devin-superset/pull/484",
+          "number": 484
+        }
+      ],
+      "acus_consumed": 4.2,
+      "structured_output": {
+        "summary": "Attempted repair of the flaky cache-key test.",
+        "root_cause": "Set iteration order made the expected key string unstable across interpreters.",
+        "files_changed": ["devin_gate_tests/test_cache_key_regression.py"],
+        "tests_added": ["test_cache_key_includes_dashboard_id"],
+        "verification": "pytest devin_gate_tests/ -q passes locally",
+        "confidence": "low"
+      }
+    }
+  },
+  {
+    "elapsed_seconds": 26,
+    "session": {
+      "status": "resuming",
+      "reason": "working",
+      "pull_requests": [
+        {
+          "url": "https://github.com/razachoudhary/devin-superset/pull/484",
+          "number": 484
+        }
+      ],
+      "acus_consumed": 4.3,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 32,
+    "session": {
+      "status": "suspended",
+      "reason": "finished",
+      "pull_requests": [
+        {
+          "url": "https://github.com/razachoudhary/devin-superset/pull/484",
+          "number": 484
+        }
+      ],
+      "acus_consumed": 5.4,
+      "structured_output": {
+        "summary": "Second repair attempt on the cache-key test.",
+        "root_cause": "Remaining ordering dependency in the serialized filter list.",
+        "files_changed": ["devin_gate_tests/test_cache_key_regression.py"],
+        "tests_added": ["test_cache_key_includes_dashboard_id"],
+        "verification": "pytest devin_gate_tests/ -q passes locally",
+        "confidence": "low"
+      }
+    }
+  }
+]

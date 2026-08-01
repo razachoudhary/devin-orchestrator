@@ -1,0 +1,32 @@
+[
+  {
+    "elapsed_seconds": 0,
+    "session": {
+      "status": "running",
+      "reason": "working",
+      "pull_requests": [],
+      "acus_consumed": 1.0,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 6,
+    "session": {
+      "status": "running",
+      "reason": "working",
+      "pull_requests": [],
+      "acus_consumed": 6.2,
+      "structured_output": null
+    }
+  },
+  {
+    "elapsed_seconds": 12,
+    "session": {
+      "status": "suspended",
+      "reason": "usage_limit_exceeded",
+      "pull_requests": [],
+      "acus_consumed": 10.0,
+      "structured_output": null
+    }
+  }
+]
