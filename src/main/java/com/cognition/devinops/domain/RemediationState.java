@@ -1,8 +1,10 @@
 package com.cognition.devinops.domain;
 
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public enum RemediationState {
     RECEIVED,           // webhook accepted, not yet gated
@@ -30,6 +32,12 @@ public enum RemediationState {
 
     public boolean isTerminal() {
         return LEGAL_TRANSITIONS.get(this).isEmpty();
+    }
+
+    public static Set<RemediationState> liveStates() {
+        return Arrays.stream(values())
+                .filter(state -> !state.isTerminal())
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     public boolean canTransitionTo(RemediationState to) {

@@ -38,7 +38,7 @@ public class ReplayDevinClient implements DevinClient {
         this(objectMapper, Clock.systemUTC());
     }
 
-    ReplayDevinClient(ObjectMapper objectMapper, Clock clock) {
+    public ReplayDevinClient(ObjectMapper objectMapper, Clock clock) {
         this.clock = clock;
         for (String scenario : SCENARIOS) {
             timelines.put(scenario, loadTimeline(objectMapper, scenario));

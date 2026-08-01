@@ -2,42 +2,15 @@ package com.cognition.devinops.devin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.cognition.devinops.MutableClock;
 import com.cognition.devinops.devin.dto.CreateSessionRequest;
 import com.cognition.devinops.devin.dto.DevinPullRequest;
 import com.cognition.devinops.devin.dto.DevinSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ReplayDevinClientTest {
-
-    static final class MutableClock extends Clock {
-
-        private Instant instant = Instant.parse("2026-01-01T00:00:00Z");
-
-        void advanceSeconds(long seconds) {
-            instant = instant.plusSeconds(seconds);
-        }
-
-        @Override
-        public ZoneId getZone() {
-            return ZoneOffset.UTC;
-        }
-
-        @Override
-        public Clock withZone(ZoneId zone) {
-            return this;
-        }
-
-        @Override
-        public Instant instant() {
-            return instant;
-        }
-    }
 
     private MutableClock clock;
     private ReplayDevinClient client;
