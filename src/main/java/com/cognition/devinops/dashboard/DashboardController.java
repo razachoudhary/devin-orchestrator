@@ -86,7 +86,7 @@ public class DashboardController {
                         r.getIssueNumber(),
                         r.getIssueTitle(),
                         r.getState().name(),
-                        r.getState() == RemediationState.ESCALATED ? r.getEscalationReason() : null,
+                        stateReason(r),
                         r.getPrUrl(),
                         r.getDevinSessionUrl(),
                         r.getAcusConsumed(),
@@ -109,6 +109,17 @@ public class DashboardController {
 
     private static long countByState(List<Remediation> all, RemediationState state) {
         return all.stream().filter(r -> r.getState() == state).count();
+    }
+
+    private static String stateReason(Remediation remediation) {
+        if (remediation.getState() == RemediationState.ESCALATED) {
+            return remediation.getEscalationReason();
+        }
+        if (remediation.getState() == RemediationState.FAILED) {
+            List<StateTransition> transitions = remediation.getTransitions();
+            return transitions.isEmpty() ? null : transitions.get(transitions.size() - 1).getReason();
+        }
+        return null;
     }
 
     private static Double cycleTimeMinutes(Remediation remediation) {

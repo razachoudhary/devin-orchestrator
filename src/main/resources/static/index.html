@@ -209,12 +209,16 @@
       holder.innerHTML = '<div class="empty">Nothing yet. Label an issue with <code>devin-fix</code> or run a scenario.</div>';
       return;
     }
-    const rows = stats.remediations.map(r => `
+    const rows = stats.remediations.map(r => {
+      const scoutDone = r.issueNumber === 0 && r.state === "FAILED";
+      const badgeText = scoutDone ? "FINISHED" : r.state;
+      const badgeClass = scoutDone ? "b-idle" : (BADGE_CLASS[r.state] || "b-idle");
+      return `
       <tr>
         <td class="num">#${r.issueNumber}</td>
         <td class="title-cell" title="${esc(r.issueTitle)}">${esc(r.issueTitle)}</td>
         <td>
-          <span class="badge ${BADGE_CLASS[r.state] || "b-idle"}">${esc(r.state)}</span>
+          <span class="badge ${badgeClass}">${esc(badgeText)}</span>
           ${r.stateReason ? `<div class="reason">${esc(r.stateReason)}</div>` : ""}
         </td>
         <td>
@@ -224,7 +228,8 @@
         <td class="num">${r.acus == null ? "–" : r.acus}</td>
         <td class="num">${r.repairAttempts}</td>
         <td class="num">${r.cycleTimeMinutes == null ? "–" : r.cycleTimeMinutes.toFixed(1) + "m"}</td>
-      </tr>`).join("");
+      </tr>`;
+    }).join("");
     holder.innerHTML = `
       <table>
         <thead><tr>
