@@ -185,11 +185,12 @@
   }
 
   function render(stats) {
+    const metered = stats.totalAcus != null && Number(stats.totalAcus) > 0;
     document.getElementById("heroValue").textContent = stats.repairLoopRecoveries;
     document.getElementById("successRate").textContent = fmt.pct(stats.successRate);
-    document.getElementById("costPerPr").textContent = fmt.usd(stats.estimatedCostPerMergedPr);
-    document.getElementById("acusPerPr").textContent = fmt.num(stats.acusPerMergedPr);
-    document.getElementById("totalAcus").textContent = stats.totalAcus == null ? "–" : stats.totalAcus;
+    document.getElementById("costPerPr").textContent = metered ? fmt.usd(stats.estimatedCostPerMergedPr) : "–";
+    document.getElementById("acusPerPr").textContent = metered ? fmt.num(stats.acusPerMergedPr) : "–";
+    document.getElementById("totalAcus").textContent = metered ? stats.totalAcus : "–";
     document.getElementById("medianCycle").textContent = fmt.min(stats.medianCycleTimeMinutes);
     document.getElementById("firstPass").textContent = fmt.pct(stats.firstPassCiSuccessRate);
     document.getElementById("inFlight").textContent = stats.totals.inFlight;
