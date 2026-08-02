@@ -4,6 +4,7 @@ import com.cognition.devinops.config.DevinProperties;
 import com.cognition.devinops.devin.dto.CreateSessionRequest;
 import com.cognition.devinops.devin.dto.DevinSelf;
 import com.cognition.devinops.devin.dto.DevinSession;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,9 +82,9 @@ class HttpDevinClient implements DevinClient {
     @Retryable(retryFor = {HttpServerErrorException.class, ResourceAccessException.class},
             maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
     public DevinSelf whoAmI() {
-        return restClient.get()
+        return DevinSelf.from(restClient.get()
                 .uri("/v3/self")
                 .retrieve()
-                .body(DevinSelf.class);
+                .body(JsonNode.class));
     }
 }

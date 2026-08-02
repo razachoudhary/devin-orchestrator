@@ -94,7 +94,7 @@ public class ReplayDevinClient implements DevinClient {
 
     @Override
     public DevinSelf whoAmI() {
-        return new DevinSelf("sim-service-user", "Replay Devin", "replay@simulate.local");
+        return new DevinSelf("sim-service-user", "Replay Devin", "replay@simulate.local", null);
     }
 
     public List<String> messagesFor(String sessionId) {

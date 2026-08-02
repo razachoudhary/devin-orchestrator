@@ -33,7 +33,11 @@ class StartupIdentityCheck implements ApplicationRunner {
         }
         try {
             DevinSelf self = devinClient.whoAmI();
-            log.info("authenticated against Devin API as {} ({})", self.name(), self.id());
+            if (self.id() == null && self.name() == null) {
+                log.info("authenticated against Devin API; identity: {}", self.raw());
+            } else {
+                log.info("authenticated against Devin API as {} ({})", self.name(), self.id());
+            }
         } catch (RestClientResponseException e) {
             throw new IllegalStateException(
                     "Devin API rejected the configured credentials (HTTP %d). Check DEVIN_API_KEY and DEVIN_ORG_ID."
