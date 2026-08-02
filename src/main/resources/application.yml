@@ -1,6 +1,11 @@
 spring:
   application:
     name: devin-remediation-orchestrator
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          no-cache: true
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/devinops}
     username: ${SPRING_DATASOURCE_USERNAME:devinops}
