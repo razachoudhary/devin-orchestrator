@@ -127,7 +127,6 @@
 
   <div class="tiles">
     <div class="tile"><div class="label">Success rate</div><div class="value" id="successRate">–</div></div>
-    <div class="tile"><div class="label">Cost per merged PR</div><div class="value" id="costPerPr">–</div></div>
     <div class="tile"><div class="label">ACUs per merged PR</div><div class="value" id="acusPerPr">–</div></div>
     <div class="tile"><div class="label">Total ACUs</div><div class="value" id="totalAcus">–</div></div>
     <div class="tile"><div class="label">Median cycle time</div><div class="value" id="medianCycle">–</div></div>
@@ -188,7 +187,6 @@
     const metered = stats.totalAcus != null && Number(stats.totalAcus) > 0;
     document.getElementById("heroValue").textContent = stats.repairLoopRecoveries;
     document.getElementById("successRate").textContent = fmt.pct(stats.successRate);
-    document.getElementById("costPerPr").textContent = metered ? fmt.usd(stats.estimatedCostPerMergedPr) : "–";
     document.getElementById("acusPerPr").textContent = metered ? fmt.num(stats.acusPerMergedPr) : "–";
     document.getElementById("totalAcus").textContent = metered ? stats.totalAcus : "–";
     document.getElementById("medianCycle").textContent = fmt.min(stats.medianCycleTimeMinutes);
