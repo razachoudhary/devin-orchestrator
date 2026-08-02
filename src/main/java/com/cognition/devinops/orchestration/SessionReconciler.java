@@ -5,6 +5,7 @@ import com.cognition.devinops.devin.DevinClient;
 import com.cognition.devinops.devin.dto.DevinPullRequest;
 import com.cognition.devinops.devin.dto.DevinSession;
 import com.cognition.devinops.devin.dto.DevinSessionStatus;
+import com.cognition.devinops.domain.FindingSource;
 import com.cognition.devinops.domain.Remediation;
 import com.cognition.devinops.domain.RemediationState;
 import com.cognition.devinops.github.StatusCommentPublisher;
@@ -66,7 +67,10 @@ public class SessionReconciler {
         if (status.status() == DevinSessionStatus.SessionStatus.SUSPENDED
                 || status.status() == DevinSessionStatus.SessionStatus.EXIT) {
             if (session.pullRequests().isEmpty()) {
-                transition(remediation, RemediationState.FAILED, "session ended without a pull request");
+                transition(remediation, RemediationState.FAILED,
+                        remediation.getSource() == FindingSource.SCOUT
+                                ? "scout run finished"
+                                : "session ended without a pull request");
             } else {
                 DevinPullRequest pullRequest = session.pullRequests().get(0);
                 remediation.recordPullRequest(pullRequest.number(), pullRequest.url());

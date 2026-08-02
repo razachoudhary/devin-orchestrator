@@ -36,17 +36,18 @@ public class DashboardController {
     @Transactional(readOnly = true)
     public DashboardStats dashboard() {
         List<Remediation> all = remediations.findAll();
+        List<Remediation> issues = all.stream().filter(r -> r.getIssueNumber() > 0).toList();
 
-        long received = all.size();
-        long merged = countByState(all, RemediationState.MERGED);
-        long escalated = countByState(all, RemediationState.ESCALATED);
-        long failed = countByState(all, RemediationState.FAILED);
-        long inFlight = all.stream().filter(r -> !r.getState().isTerminal()).count();
+        long received = issues.size();
+        long merged = countByState(issues, RemediationState.MERGED);
+        long escalated = countByState(issues, RemediationState.ESCALATED);
+        long failed = countByState(issues, RemediationState.FAILED);
+        long inFlight = issues.stream().filter(r -> !r.getState().isTerminal()).count();
 
         long settled = merged + escalated + failed;
         Double successRate = settled == 0 ? null : (double) merged / settled;
 
-        List<Double> cycleTimes = all.stream()
+        List<Double> cycleTimes = issues.stream()
                 .filter(r -> r.getState() == RemediationState.MERGED)
                 .map(DashboardController::cycleTimeMinutes)
                 .filter(java.util.Objects::nonNull)
@@ -63,17 +64,17 @@ public class DashboardController {
         Double estimatedCostPerMergedPr = acusPerMergedPr == null
                 ? null : acusPerMergedPr * appProperties.acuCostUsd().doubleValue();
 
-        long mergedFirstPass = all.stream()
+        long mergedFirstPass = issues.stream()
                 .filter(r -> r.getState() == RemediationState.MERGED && r.getRepairAttempts() == 0)
                 .count();
         Double firstPassCiSuccessRate = merged == 0 ? null : (double) mergedFirstPass / merged;
 
-        long repairLoopRecoveries = all.stream()
+        long repairLoopRecoveries = issues.stream()
                 .filter(r -> r.getState() == RemediationState.MERGED && r.getRepairAttempts() > 0)
                 .count();
 
         Map<String, Long> escalationsByReason = new LinkedHashMap<>();
-        all.stream()
+        issues.stream()
                 .filter(r -> r.getState() == RemediationState.ESCALATED)
                 .forEach(r -> escalationsByReason.merge(
                         r.getEscalationReason() == null ? "unknown" : r.getEscalationReason(), 1L, Long::sum));

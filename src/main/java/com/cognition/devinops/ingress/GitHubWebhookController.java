@@ -67,6 +67,7 @@ public class GitHubWebhookController {
                         && !payload.checkRun().pullRequests().isEmpty()) {
                     dispatcher.checkRunCompleted(
                             payload.checkRun().pullRequests().get(0).number(),
+                            payload.checkRun().id(),
                             payload.checkRun().name(),
                             payload.checkRun().conclusion(),
                             excerpt(payload.checkRun()));

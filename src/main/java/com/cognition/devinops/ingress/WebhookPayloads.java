@@ -26,7 +26,7 @@ public final class WebhookPayloads {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record CheckRun(String name, String conclusion, Output output,
+    public record CheckRun(long id, String name, String conclusion, Output output,
                            @JsonProperty("pull_requests") List<PullRequestRef> pullRequests) {
 
         public List<PullRequestRef> pullRequests() {
