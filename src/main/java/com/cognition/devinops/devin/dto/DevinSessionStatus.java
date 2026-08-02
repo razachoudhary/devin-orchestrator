@@ -24,15 +24,26 @@ public record DevinSessionStatus(SessionStatus status, String reason) {
             "org_usage_limit_exceeded",
             "total_session_limit_exceeded");
 
+    private static final Set<String> RESTING_REASONS = Set.of(
+            "waiting_for_user",
+            "finished");
+
     public static DevinSessionStatus of(String status, String reason) {
         return new DevinSessionStatus(SessionStatus.valueOf(status.toUpperCase(Locale.ROOT)), reason);
     }
 
     public boolean isActive() {
-        return status == SessionStatus.NEW
+        return !isSettled()
+                && (status == SessionStatus.NEW
                 || status == SessionStatus.CLAIMED
                 || status == SessionStatus.RUNNING
-                || status == SessionStatus.RESUMING;
+                || status == SessionStatus.RESUMING);
+    }
+
+    public boolean isSettled() {
+        return status == SessionStatus.SUSPENDED
+                || status == SessionStatus.EXIT
+                || (reason != null && RESTING_REASONS.contains(reason));
     }
 
     public boolean isBlocked() {

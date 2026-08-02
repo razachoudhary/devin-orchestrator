@@ -64,8 +64,7 @@ public class SessionReconciler {
             escalateIfTimedOut(remediation);
             return;
         }
-        if (status.status() == DevinSessionStatus.SessionStatus.SUSPENDED
-                || status.status() == DevinSessionStatus.SessionStatus.EXIT) {
+        if (status.isSettled()) {
             if (session.pullRequests().isEmpty()) {
                 transition(remediation, RemediationState.FAILED,
                         remediation.getSource() == FindingSource.SCOUT

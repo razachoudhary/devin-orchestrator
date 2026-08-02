@@ -1,5 +1,6 @@
 package com.cognition.devinops.devin.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,7 +12,7 @@ public record DevinSession(
         @JsonProperty("session_id") String sessionId,
         @JsonProperty("url") String url,
         @JsonProperty("status") String status,
-        @JsonProperty("reason") String reason,
+        @JsonProperty("reason") @JsonAlias("status_detail") String reason,
         @JsonProperty("pull_requests") List<DevinPullRequest> pullRequests,
         @JsonProperty("acus_consumed") BigDecimal acusConsumed,
         @JsonProperty("structured_output") JsonNode structuredOutput

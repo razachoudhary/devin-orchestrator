@@ -3,6 +3,7 @@ package com.cognition.devinops.devin.dto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -42,5 +43,34 @@ class SessionStatusMappingTest {
     void unknownStatusThrows() {
         assertThatThrownBy(() -> DevinSessionStatus.of("hibernating", "working"))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void runningSessionWaitingForUserIsSettledNotActive() {
+        DevinSessionStatus status = DevinSessionStatus.of("running", "waiting_for_user");
+        assertThat(status.isActive()).isFalse();
+        assertThat(status.isSettled()).isTrue();
+        assertThat(status.isBlocked()).isFalse();
+    }
+
+    @Test
+    void realApiPayloadShapeMapsToStatusDetailAndPrUrl() throws Exception {
+        DevinSession session = new ObjectMapper().readValue("""
+                {
+                  "session_id": "4ea9af71",
+                  "url": "https://app.devin.ai/sessions/4ea9af71",
+                  "status": "running",
+                  "status_detail": "waiting_for_user",
+                  "pull_requests": [
+                    {"pr_url": "https://github.com/razachoudhary/devin-superset/pull/10", "pr_state": "open"}
+                  ],
+                  "acus_consumed": 0.0
+                }
+                """, DevinSession.class);
+        assertThat(session.reason()).isEqualTo("waiting_for_user");
+        assertThat(session.sessionStatus().isSettled()).isTrue();
+        assertThat(session.pullRequests().get(0).number()).isEqualTo(10);
+        assertThat(session.pullRequests().get(0).url())
+                .isEqualTo("https://github.com/razachoudhary/devin-superset/pull/10");
     }
 }
